@@ -1,0 +1,34 @@
+development:
+  database:
+    table: northstar
+    username: asirauser
+    password: asirapass
+    host: "127.0.0.1"
+    port: "5432"
+    maxlifetime: 30
+    idle_conns: 10
+    open_conns: 100
+    sslmode: disable
+    logmode: true
+    timezone: Asia/Jakarta
+  kafka:
+    host: "10.148.0.3"
+    port: "9092"
+    user: user
+    pass: oRB5KjfuHdXc
+    client_id: northstar
+    sasl: true
+    log_verbose: true
+    topic: northstar_logger
+  jwt:
+    duration: 10080 # in minutes
+    jwt_secret: sXQ8jUMpueOvN5P3cdCR
+  mailer:
+    host : smtp.gmail.com
+    port : 587
+    email : infra.ayannah@gmail.com 
+    password : jakarta2019
+    
+staging:
+
+production:

@@ -1,0 +1,22 @@
+version: '3'
+
+services:
+  northstar:
+    build: .
+    ports:
+      - 8006:8006
+    image: northstar:development
+    volumes:
+      - ./:/go/src/northstar
+    hostname: localhost
+    environment:
+      - APPNAME=northstar
+      - ENV=local
+      - APPPORT=8001
+      - CONFIGPATH=$$GOPATH/src/northstar
+    container_name: northstar
+    
+networks:
+  default:
+    external:
+      name: asira_net
