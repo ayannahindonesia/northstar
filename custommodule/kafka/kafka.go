@@ -6,7 +6,6 @@ import (
 	"log"
 	"northstar/application"
 	"northstar/models"
-	"strings"
 	"sync"
 
 	"github.com/Shopify/sarama"
@@ -74,39 +73,10 @@ func (k *Consumer) Listen() ([]byte, error) {
 }
 
 func processMessage(kafkaMessage []byte) (err error) {
-	var arr map[string]interface{}
+	mod := models.Log{}
 
-	data := strings.SplitN(string(kafkaMessage), ":", 2)
+	json.Unmarshal(kafkaMessage, &mod)
+	err = mod.Create()
 
-	err = json.Unmarshal([]byte(data[1]), &arr)
-	if err != nil {
-		return err
-	}
-
-	switch data[0] {
-	default:
-		return nil
-	case "log":
-		mod := models.Log{}
-
-		marshal, _ := json.Marshal(arr["payload"])
-		json.Unmarshal(marshal, &mod)
-
-		switch arr["mode"] {
-		default:
-			err = fmt.Errorf("invalid payload")
-			break
-		case "create":
-			err = mod.FirstOrCreate()
-			break
-		case "update":
-			err = mod.Save()
-			break
-		case "delete":
-			err = mod.Delete()
-			break
-		}
-		break
-	}
 	return err
 }
