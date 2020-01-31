@@ -21,4 +21,4 @@ CMD if [ "${APPENV}" = "staging" ] || [ "${APPENV}" = "production" ] ; then \
     && dep ensure -v \
     && go build -v -o $GOPATH/bin/"${APPNAME}" \
     && "${APPNAME}" run \
-EXPOSE 8000
+EXPOSE 8006

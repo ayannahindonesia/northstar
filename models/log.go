@@ -1,19 +1,19 @@
 package models
 
 import (
+	"log"
 	"math"
 	"strings"
 
 	"github.com/ayannahindonesia/basemodel"
 	"github.com/jinzhu/gorm"
-	"github.com/jinzhu/gorm/dialects/postgres"
 )
 
 // Log main type
 type Log struct {
 	basemodel.BaseModel
-	Level    string         `json:"level" gorm:"column:level;type:varchar(255)"`
-	Messages postgres.Jsonb `json:"messages" gorm:"column:messages"`
+	Level    string `json:"level" gorm:"column:level;type:varchar(255)"`
+	Messages string `json:"messages" gorm:"column:messages;type:text"`
 }
 
 // Create func
@@ -42,12 +42,13 @@ func (model *Log) SingleFindFilter(filter interface{}) error {
 }
 
 // PagedFindFilter search using filter and return with pagination format
-func (model *Log) PagedFindFilter(page int, rows int, order []string, sort []string, filter map[string]interface{}) (basemodel.PagedFindResult, error) {
+func (model *Log) PagedFindFilter(page int, rows int, order []string, sort []string, filter []string) (basemodel.PagedFindResult, error) {
 	if page <= 0 {
 		page = 1
 	}
 
 	query := basemodel.DB
+	models := []Log{}
 
 	query = conditionQuery(query, filter)
 	query = orderSortQuery(query, order, sort)
@@ -55,7 +56,7 @@ func (model *Log) PagedFindFilter(page int, rows int, order []string, sort []str
 	temp := query
 	var totalRows int
 
-	temp.Find(&model).Count(&totalRows)
+	temp.Find(&models).Count(&totalRows)
 
 	var (
 		offset   int
@@ -70,7 +71,7 @@ func (model *Log) PagedFindFilter(page int, rows int, order []string, sort []str
 		query = query.Limit(rows).Offset(offset)
 	}
 
-	err = query.Find(&model).Error
+	err = query.Find(&models).Error
 
 	result := basemodel.PagedFindResult{
 		TotalData:   totalRows,
@@ -79,16 +80,16 @@ func (model *Log) PagedFindFilter(page int, rows int, order []string, sort []str
 		LastPage:    lastPage,
 		From:        offset + 1,
 		To:          offset + rows,
-		Data:        model,
+		Data:        models,
 	}
 
 	return result, err
 }
 
-func conditionQuery(query *gorm.DB, filter map[string]interface{}) *gorm.DB {
-	query = query.Joins("JOIN LATERAL jsonb_array_elements(log.messages) j ON true")
-	for k, v := range filter {
-		query = query.Where("value->>'?' = ?", k, v)
+func conditionQuery(query *gorm.DB, filter []string) *gorm.DB {
+	log.Printf("filter = %v", filter)
+	for _, v := range filter {
+		query = query.Where("messages LIKE ?", "%"+v+"%")
 	}
 
 	return query

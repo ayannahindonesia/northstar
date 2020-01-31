@@ -4,6 +4,7 @@ import (
 	"flag"
 	"log"
 	"northstar/application"
+	"northstar/custommodule/seed"
 	"northstar/router"
 	"os"
 
@@ -34,6 +35,14 @@ func main() {
 		}))
 
 		e.Logger.Fatal(e.Start(":" + application.App.Port))
+		os.Exit(0)
+		break
+	case "seed":
+		seed.Seed()
+		os.Exit(0)
+		break
+	case "unseed":
+		seed.Unseed()
 		os.Exit(0)
 		break
 	}
