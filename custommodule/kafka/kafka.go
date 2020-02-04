@@ -6,6 +6,7 @@ import (
 	"log"
 	"northstar/application"
 	"northstar/models"
+	"strings"
 	"sync"
 
 	"github.com/Shopify/sarama"
@@ -55,11 +56,8 @@ func init() {
 // SetPartitionConsumer func
 func (k *Consumer) SetPartitionConsumer(topic string) (err error) {
 	k.PartitionConsumer, err = k.KafkaConsumer.ConsumePartition(topic, 0, sarama.OffsetOldest)
-	if err != nil {
-		return err
-	}
 
-	return nil
+	return err
 }
 
 // Listen to kafka
@@ -73,10 +71,18 @@ func (k *Consumer) Listen() ([]byte, error) {
 }
 
 func processMessage(kafkaMessage []byte) (err error) {
-	mod := models.Log{}
+	splitKafkaString := strings.SplitN(string(kafkaMessage), ":", 2)
 
-	json.Unmarshal(kafkaMessage, &mod)
-	err = mod.Create()
+	switch splitKafkaString[0] {
+	default:
+		return fmt.Errorf("cannot process kafka message : %v", string(kafkaMessage))
+	case "log":
+		mod := models.Log{}
+
+		json.Unmarshal(kafkaMessage, &mod)
+		err = mod.Create()
+		break
+	}
 
 	return err
 }
