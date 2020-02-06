@@ -79,7 +79,7 @@ func processMessage(kafkaMessage []byte) (err error) {
 	case "log":
 		mod := models.Log{}
 
-		json.Unmarshal(kafkaMessage, &mod)
+		json.Unmarshal([]byte(splitKafkaString[1]), &mod)
 		err = mod.Create()
 		break
 	}

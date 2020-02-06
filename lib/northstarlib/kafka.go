@@ -54,19 +54,9 @@ func (n *NorthstarLib) SubmitKafkaLog(i interface{}, model string) (err error) {
 	return err
 }
 
-func kafkaLogBuilder(i interface{}, model string) (payload interface{}) {
-	type KafkaModelPayload struct {
-		Model   string
-		Payload interface{}
-	}
-
-	var inInterface map[string]interface{}
+func kafkaLogBuilder(i interface{}, model string) (payload map[string]interface{}) {
 	inrec, _ := json.Marshal(i)
-	json.Unmarshal(inrec, &inInterface)
-	payload = KafkaModelPayload{
-		Model:   model,
-		Payload: i,
-	}
+	json.Unmarshal(inrec, &payload)
 
 	return payload
 }

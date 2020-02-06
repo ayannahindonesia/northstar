@@ -8,6 +8,8 @@ import (
 	"northstar/router"
 	"os"
 
+	_ "northstar/custommodule/kafka"
+
 	"github.com/labstack/echo/middleware"
 )
 

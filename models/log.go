@@ -12,7 +12,7 @@ import (
 // Log main type
 type Log struct {
 	basemodel.BaseModel
-	Level    string `json:"level" gorm:"column:level;type:varchar(255)"`
+	Level    string `json:"level" gorm:"column:level;type:varchar(255);default:'info'"`
 	Messages string `json:"messages" gorm:"column:messages;type:text"`
 }
 
