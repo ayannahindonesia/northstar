@@ -26,6 +26,9 @@ type (
 
 // SubmitKafkaLog func
 func (n *NorthstarLib) SubmitKafkaLog(i interface{}, model string) (err error) {
+	if len(model) < 1 {
+		model = "log"
+	}
 	build := kafkaLogBuilder(i, model)
 
 	jMarshal, _ := json.Marshal(build)
