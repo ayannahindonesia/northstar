@@ -1,7 +1,6 @@
 package models
 
 import (
-	"log"
 	"math"
 	"strings"
 
@@ -9,12 +8,23 @@ import (
 	"github.com/jinzhu/gorm"
 )
 
-// Log main type
-type Log struct {
-	basemodel.BaseModel
-	Level    string `json:"level" gorm:"column:level;type:varchar(255);default:'info'"`
-	Messages string `json:"messages" gorm:"column:messages;type:text"`
-}
+type (
+	// Log main type
+	Log struct {
+		basemodel.BaseModel
+		Client   string `json:"client" gorm:"column:client;type:varchar(255)"`
+		Level    string `json:"level" gorm:"column:level;type:varchar(255);default:'info'"`
+		Messages string `json:"messages" gorm:"column:messages;type:text"`
+	}
+	// LogQueryFilter filter struct
+	LogQueryFilter struct {
+		Client    string
+		Level     string
+		StartDate string
+		EndDate   string
+		Messages  []string
+	}
+)
 
 // Create func
 func (model *Log) Create() error {
@@ -42,7 +52,7 @@ func (model *Log) SingleFindFilter(filter interface{}) error {
 }
 
 // PagedFindFilter search using filter and return with pagination format
-func (model *Log) PagedFindFilter(page int, rows int, order []string, sort []string, filter []string) (basemodel.PagedFindResult, error) {
+func (model *Log) PagedFindFilter(page int, rows int, order []string, sort []string, filter *LogQueryFilter) (basemodel.PagedFindResult, error) {
 	if page <= 0 {
 		page = 1
 	}
@@ -86,10 +96,24 @@ func (model *Log) PagedFindFilter(page int, rows int, order []string, sort []str
 	return result, err
 }
 
-func conditionQuery(query *gorm.DB, filter []string) *gorm.DB {
-	log.Printf("filter = %v", filter)
-	for _, v := range filter {
+func conditionQuery(query *gorm.DB, filter *LogQueryFilter) *gorm.DB {
+	for _, v := range filter.Messages {
 		query = query.Where("messages LIKE ?", "%"+v+"%")
+	}
+
+	if len(filter.Client) > 0 {
+		query = query.Where("client = ?", filter.Client)
+	}
+
+	if len(filter.StartDate) > 0 {
+		if len(filter.EndDate) < 1 {
+			filter.EndDate = filter.StartDate
+		}
+		query = query.Where("created_at BETWEEN ? AND ?", filter.StartDate, filter.EndDate)
+	}
+
+	if len(filter.Level) > 0 {
+		query = query.Where("level = ?", filter.Level)
 	}
 
 	return query

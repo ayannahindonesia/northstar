@@ -1,6 +1,7 @@
 package kafka
 
 import (
+	"encoding/base64"
 	"encoding/json"
 	"fmt"
 	"log"
@@ -55,7 +56,7 @@ func init() {
 
 // SetPartitionConsumer func
 func (k *Consumer) SetPartitionConsumer(topic string) (err error) {
-	k.PartitionConsumer, err = k.KafkaConsumer.ConsumePartition(topic, 0, sarama.OffsetOldest)
+	k.PartitionConsumer, err = k.KafkaConsumer.ConsumePartition(topic, 0, sarama.OffsetNewest)
 
 	return err
 }
@@ -71,18 +72,50 @@ func (k *Consumer) Listen() ([]byte, error) {
 }
 
 func processMessage(kafkaMessage []byte) (err error) {
-	splitKafkaString := strings.SplitN(string(kafkaMessage), ":", 2)
+	splitKafkaString := strings.SplitN(string(kafkaMessage), ":", 3)
+	if len(splitKafkaString) != 3 {
+		return fmt.Errorf("invalid kafka message")
+	}
 
-	switch splitKafkaString[0] {
+	client, err := decodeSecret(splitKafkaString[0])
+	if err != nil {
+		return err
+	}
+
+	switch splitKafkaString[1] {
 	default:
 		return fmt.Errorf("cannot process kafka message : %v", string(kafkaMessage))
 	case "log":
 		mod := models.Log{}
 
-		json.Unmarshal([]byte(splitKafkaString[1]), &mod)
+		json.Unmarshal([]byte(splitKafkaString[2]), &mod)
+		mod.Client = client
 		err = mod.Create()
 		break
 	}
 
 	return err
+}
+
+func decodeSecret(secret string) (s string, err error) {
+	decode, err := base64.StdEncoding.DecodeString(secret)
+	if err != nil {
+		return "", err
+	}
+
+	split := strings.Split(string(decode), ":")
+	if len(split) != 2 {
+		return "", fmt.Errorf("invalid credential")
+	}
+
+	client := models.Client{}
+	err = client.SingleFindFilter(&models.Client{
+		Key:    split[0],
+		Secret: split[1],
+	})
+	if err != nil {
+		return "", err
+	}
+
+	return client.Name, nil
 }

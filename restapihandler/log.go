@@ -19,13 +19,13 @@ func LogList(c echo.Context) error {
 	defer c.Request().Body.Close()
 
 	var (
-		logs    models.Log
-		result  basemodel.PagedFindResult
-		unmarsh []string
-		rows    int
-		page    int
-		// startDate string
-		// endDate   string
+		logs      models.Log
+		result    basemodel.PagedFindResult
+		unmarsh   []string
+		rows      int
+		page      int
+		startDate string
+		endDate   string
 	)
 
 	// pagination parameters
@@ -39,12 +39,11 @@ func LogList(c echo.Context) error {
 	orderby := strings.Split(c.QueryParam("orderby"), ",")
 	sort := strings.Split(c.QueryParam("sort"), ",")
 
-	// level := c.QueryParam("level")
-	// if startDate = c.QueryParam("start_date"); len(startDate) > 0 {
-	// 	if endDate := c.QueryParam("end_date"); len(endDate) < 1 {
-	// 		endDate = startDate
-	// 	}
-	// }
+	if startDate = c.QueryParam("start_date"); len(startDate) > 0 {
+		if endDate := c.QueryParam("end_date"); len(endDate) < 1 {
+			endDate = startDate
+		}
+	}
 
 	b, err := ioutil.ReadAll(c.Request().Body)
 	log.Printf("body : %v", string(b))
@@ -57,7 +56,13 @@ func LogList(c echo.Context) error {
 		unmarsh = []string{}
 	}
 
-	result, err = logs.PagedFindFilter(page, rows, orderby, sort, unmarsh)
+	result, err = logs.PagedFindFilter(page, rows, orderby, sort, &models.LogQueryFilter{
+		Client:    c.QueryParam("client"),
+		Level:     c.QueryParam("level"),
+		StartDate: startDate,
+		EndDate:   endDate,
+		Messages:  unmarsh,
+	})
 	if err != nil {
 		return c.JSON(http.StatusNotFound, err)
 	}
