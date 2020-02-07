@@ -14,6 +14,7 @@ type (
 	NorthstarLib struct {
 		Host         string
 		Topic        string
+		Secret       string
 		SaramaConfig *sarama.Config
 	}
 	// Log models
@@ -25,7 +26,7 @@ type (
 )
 
 // SubmitKafkaLog func
-func (n *NorthstarLib) SubmitKafkaLog(i interface{}, model string, secret string) (err error) {
+func (n *NorthstarLib) SubmitKafkaLog(i interface{}, model string) (err error) {
 	if len(model) < 1 {
 		model = "log"
 	}
@@ -41,7 +42,7 @@ func (n *NorthstarLib) SubmitKafkaLog(i interface{}, model string, secret string
 
 	msg := &sarama.ProducerMessage{
 		Topic: n.Topic,
-		Value: sarama.StringEncoder(secret + ":" + model + ":" + string(jMarshal)),
+		Value: sarama.StringEncoder(n.Secret + ":" + model + ":" + string(jMarshal)),
 	}
 
 	select {
