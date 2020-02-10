@@ -15,22 +15,27 @@ type (
 		Host         string
 		Topic        string
 		Secret       string
+		Send         bool
 		SaramaConfig *sarama.Config
 	}
 	// Log models
 	Log struct {
 		basemodel.BaseModel
 		Level    string `json:"level"`
+		Tag      string `json:"tag"`
 		Messages string `json:"messages"`
 	}
 )
 
 // SubmitKafkaLog func
-func (n *NorthstarLib) SubmitKafkaLog(i interface{}, model string) (err error) {
+func (n *NorthstarLib) SubmitKafkaLog(l Log, model string) (err error) {
+	if !n.Send {
+		return nil
+	}
 	if len(model) < 1 {
 		model = "log"
 	}
-	build := kafkaLogBuilder(i, model)
+	build := kafkaLogBuilder(l, model)
 
 	jMarshal, _ := json.Marshal(build)
 
@@ -55,8 +60,8 @@ func (n *NorthstarLib) SubmitKafkaLog(i interface{}, model string) (err error) {
 	return err
 }
 
-func kafkaLogBuilder(i interface{}, model string) (payload map[string]interface{}) {
-	inrec, _ := json.Marshal(i)
+func kafkaLogBuilder(l Log, model string) (payload map[string]interface{}) {
+	inrec, _ := json.Marshal(l)
 	json.Unmarshal(inrec, &payload)
 
 	return payload
