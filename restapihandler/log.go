@@ -37,7 +37,7 @@ func LogList(c echo.Context) error {
 	sort := strings.Split(c.QueryParam("sort"), ",")
 
 	if startDate = c.QueryParam("start_date"); len(startDate) > 0 {
-		if endDate := c.QueryParam("end_date"); len(endDate) < 1 {
+		if endDate = c.QueryParam("end_date"); len(endDate) < 1 {
 			endDate = startDate
 		}
 	}
