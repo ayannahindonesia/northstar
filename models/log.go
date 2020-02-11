@@ -106,7 +106,9 @@ func (model *Log) PagedFindFilter(page int, rows int, order []string, sort []str
 
 func conditionQuery(query *gorm.DB, filter *LogQueryFilter) *gorm.DB {
 	for _, v := range filter.Messages {
-		query = query.Where("messages LIKE ?", "%"+v+"%")
+		if len(v) > 0 {
+			query = query.Where("messages LIKE ?", "%"+v+"%")
+		}
 	}
 
 	if len(filter.Client) > 0 {
