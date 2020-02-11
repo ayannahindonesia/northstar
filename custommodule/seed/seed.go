@@ -46,23 +46,40 @@ func Seed() {
 
 		logs := []models.Log{
 			models.Log{
-				Level:    "event_seed",
+				Level:    "info_seed",
+				Client:   "Client A",
+				Tag:      "c01",
+				Note:     "note a",
+				UID:      "2",
+				Username: "user dummy",
 				Messages: "test log messages one red",
 			},
 			models.Log{
 				Level:    "log_seed",
+				Client:   "Client B",
+				Tag:      "c02",
+				Note:     "note b",
 				Messages: "test log messages two red",
 			},
 			models.Log{
 				Level:    "warning_seed",
+				Client:   "Client C",
+				UID:      "4",
+				Username: "iamnumber4",
 				Messages: "test log messages three red",
 			},
 			models.Log{
 				Level:    "error_seed",
+				Client:   "Client C",
+				UID:      "4",
+				Username: "iamnumber4",
 				Messages: "test log messages four blue",
 			},
 			models.Log{
 				Level:    "debug_seed",
+				Client:   "Client C",
+				UID:      "4",
+				Username: "iamnumber4",
 				Messages: "test log messages five blue",
 			},
 		}

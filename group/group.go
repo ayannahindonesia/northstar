@@ -12,5 +12,5 @@ func NorthstarGroup(e *echo.Echo) {
 	g := e.Group("/ns")
 	application.App.JWT.SetClientJWTmiddlewares(g)
 
-	g.POST("/log", restapihandler.LogList)
+	g.GET("/log", restapihandler.LogList)
 }

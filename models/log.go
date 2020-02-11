@@ -14,12 +14,19 @@ type (
 		basemodel.BaseModel
 		Client   string `json:"client" gorm:"column:client;type:varchar(255)"`
 		Tag      string `json:"tag" gorm:"column:tag;type:varchar(255)"`
+		Note     string `json:"note" gorm:"column:note;type:varchar(255)"`
+		UID      string `json:"uid" gorm:"column:uid;type:varchar(255)"`
+		Username string `json:"username" gorm:"column:username;type:varchar(255)"`
 		Level    string `json:"level" gorm:"column:level;type:varchar(255);default:'info'"`
 		Messages string `json:"messages" gorm:"column:messages;type:text"`
 	}
 	// LogQueryFilter filter struct
 	LogQueryFilter struct {
 		Client    string
+		Tag       string
+		Note      string
+		UID       string
+		Username  string
 		Level     string
 		StartDate string
 		EndDate   string
@@ -106,15 +113,31 @@ func conditionQuery(query *gorm.DB, filter *LogQueryFilter) *gorm.DB {
 		query = query.Where("client = ?", filter.Client)
 	}
 
+	if len(filter.Level) > 0 {
+		query = query.Where("level = ?", filter.Level)
+	}
+
+	if len(filter.Tag) > 0 {
+		query = query.Where("tag = ?", filter.Tag)
+	}
+
+	if len(filter.Note) > 0 {
+		query = query.Where("note LIKE ?", "%"+filter.Note+"%")
+	}
+
+	if len(filter.UID) > 0 {
+		query = query.Where("uid = ?", filter.UID)
+	}
+
+	if len(filter.Username) > 0 {
+		query = query.Where("username LIKE ?", "%"+filter.Username+"%")
+	}
+
 	if len(filter.StartDate) > 0 {
 		if len(filter.EndDate) < 1 {
 			filter.EndDate = filter.StartDate
 		}
 		query = query.Where("created_at BETWEEN ? AND ?", filter.StartDate, filter.EndDate)
-	}
-
-	if len(filter.Level) > 0 {
-		query = query.Where("level = ?", filter.Level)
 	}
 
 	return query

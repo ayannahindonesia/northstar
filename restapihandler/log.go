@@ -1,9 +1,6 @@
 package restapihandler
 
 import (
-	"encoding/json"
-	"io/ioutil"
-	"log"
 	"net/http"
 	"northstar/models"
 	"strconv"
@@ -21,11 +18,11 @@ func LogList(c echo.Context) error {
 	var (
 		logs      models.Log
 		result    basemodel.PagedFindResult
-		unmarsh   []string
 		rows      int
 		page      int
 		startDate string
 		endDate   string
+		err       error
 	)
 
 	// pagination parameters
@@ -45,23 +42,16 @@ func LogList(c echo.Context) error {
 		}
 	}
 
-	b, err := ioutil.ReadAll(c.Request().Body)
-	log.Printf("body : %v", string(b))
-	if err != nil {
-		return c.JSON(http.StatusInternalServerError, err)
-	}
-
-	err = json.Unmarshal(b, &unmarsh)
-	if err != nil {
-		unmarsh = []string{}
-	}
-
 	result, err = logs.PagedFindFilter(page, rows, orderby, sort, &models.LogQueryFilter{
 		Client:    c.QueryParam("client"),
+		Tag:       c.QueryParam("tag"),
+		Note:      c.QueryParam("note"),
+		UID:       c.QueryParam("uid"),
+		Username:  c.QueryParam("username"),
 		Level:     c.QueryParam("level"),
 		StartDate: startDate,
 		EndDate:   endDate,
-		Messages:  unmarsh,
+		Messages:  strings.Split(c.QueryParam("messages"), ","),
 	})
 	if err != nil {
 		return c.JSON(http.StatusNotFound, err)
