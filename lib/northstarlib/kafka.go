@@ -21,8 +21,11 @@ type (
 	// Log models
 	Log struct {
 		basemodel.BaseModel
-		Level    string `json:"level"`
 		Tag      string `json:"tag"`
+		Note     string `json:"note"`
+		UID      string `json:"uid"`
+		Username string `json:"username"`
+		Level    string `json:"level"`
 		Messages string `json:"messages"`
 	}
 )
