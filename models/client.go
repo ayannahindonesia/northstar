@@ -2,6 +2,7 @@ package models
 
 import (
 	"github.com/ayannahindonesia/basemodel"
+	"github.com/jinzhu/gorm"
 
 	"github.com/google/uuid"
 )
@@ -45,4 +46,21 @@ func (model *Client) FindbyID(id uint64) error {
 // SingleFindFilter func
 func (model *Client) SingleFindFilter(filter interface{}) error {
 	return basemodel.SingleFindFilter(&model, filter)
+}
+
+// ClientNameList returns client name list
+func (model *Client) ClientNameList(db *gorm.DB) (interface{}, error) {
+	type ClientNameList struct {
+		Name string `json:"name"`
+	}
+	clients := []ClientNameList{}
+	db = db.New()
+	err := db.Table("clients").Select("DISTINCT name").Scan(&clients).Error
+
+	slc := []string{}
+	for _, v := range clients {
+		slc = append(slc, v.Name)
+	}
+
+	return slc, err
 }

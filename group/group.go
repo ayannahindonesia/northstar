@@ -13,4 +13,5 @@ func NorthstarGroup(e *echo.Echo) {
 	application.App.JWT.SetClientJWTmiddlewares(g)
 
 	g.GET("/log", restapihandler.LogList)
+	g.GET("/client", restapihandler.ClientList)
 }
