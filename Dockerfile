@@ -6,7 +6,7 @@ ARG CONFIGPATH="$$GOPATH/src/northstar"
 ADD . $GOPATH/src/"${APPNAME}"
 WORKDIR $GOPATH/src/"${APPNAME}"
 
-RUN apk add --update git gcc libc-dev tzdata;
+RUN apk add --no-cache --update git gcc libc-dev tzdata;
 #  tzdata wget gcc libc-dev make openssl py-pip;
 
 ENV TZ=Asia/Jakarta
