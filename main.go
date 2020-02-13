@@ -33,6 +33,7 @@ func main() {
 		// CORS react handle
 		e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
 			AllowOrigins: []string{"*"},
+			AllowMethods: []string{"*"},
 			AllowHeaders: []string{"*"},
 		}))
 
