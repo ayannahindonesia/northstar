@@ -4,8 +4,11 @@ import (
 	"flag"
 	"log"
 	"northstar/application"
+	"northstar/custommodule/seed"
 	"northstar/router"
 	"os"
+
+	_ "northstar/custommodule/kafka"
 
 	"github.com/labstack/echo/middleware"
 )
@@ -30,10 +33,19 @@ func main() {
 		// CORS react handle
 		e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
 			AllowOrigins: []string{"*"},
+			AllowMethods: []string{"*"},
 			AllowHeaders: []string{"*"},
 		}))
 
 		e.Logger.Fatal(e.Start(":" + application.App.Port))
+		os.Exit(0)
+		break
+	case "seed":
+		seed.Seed()
+		os.Exit(0)
+		break
+	case "unseed":
+		seed.Unseed()
 		os.Exit(0)
 		break
 	}

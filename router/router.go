@@ -1,7 +1,8 @@
 package router
 
 import (
-	"os"
+	"northstar/group"
+	"northstar/restapihandler"
 
 	"github.com/labstack/echo"
 	"github.com/labstack/echo/middleware"
@@ -16,9 +17,9 @@ func NewRouter() *echo.Echo {
 		"/northstar/*": "/$1",
 	}))
 
-	// files url
-	gopath, _ := os.Getwd()
-	e.Static("/", gopath+"/assets")
+	e.GET("/login", restapihandler.ClientLogin)
+
+	group.NorthstarGroup(e)
 
 	return e
 }

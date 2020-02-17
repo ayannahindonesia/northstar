@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"northstar/custommodule/emailer"
+	"northstar/custommodule/northstarjwt"
 	"northstar/models"
 	"os"
 	"strings"
@@ -24,14 +25,15 @@ var App *Application
 type (
 	// Application main type
 	Application struct {
-		Name    string          `json:"name"`
-		Port    string          `json:"port"`
-		Version string          `json:"version"`
-		ENV     string          `json:"env"`
-		Config  viper.Viper     `json:"prog_config"`
-		DB      *gorm.DB        `json:"db"`
-		Kafka   KafkaInstance   `json:"kafka"`
-		Emailer emailer.Emailer `json:"email"`
+		Name    string           `json:"name"`
+		Port    string           `json:"port"`
+		Version string           `json:"version"`
+		ENV     string           `json:"env"`
+		Config  viper.Viper      `json:"prog_config"`
+		JWT     northstarjwt.JWT `json:"jwt"`
+		DB      *gorm.DB         `json:"db"`
+		Kafka   KafkaInstance    `json:"kafka"`
+		Emailer emailer.Emailer  `json:"email"`
 	}
 
 	// KafkaInstance type
@@ -41,7 +43,7 @@ type (
 	}
 )
 
-// Initiate asira instances
+// Initiate instances
 func init() {
 	var err error
 	App = &Application{}
@@ -56,6 +58,7 @@ func init() {
 		panic(fmt.Sprintf("DB init error : %v", err))
 	}
 
+	App.JWT = northstarjwt.New(App.Config.GetString(fmt.Sprintf("%s.jwt.jwt_secret", App.ENV)), App.Config.GetInt64(fmt.Sprintf("%s.jwt.duration", App.ENV)))
 	App.KafkaInit()
 	App.EmailerInit()
 }
@@ -139,7 +142,7 @@ func (x *Application) DBinit() (err error) {
 
 // AutoMigrate updates db structures
 func (x *Application) AutoMigrate() error {
-	return x.DB.AutoMigrate(&models.Log{}).Error
+	return x.DB.AutoMigrate(&models.Client{}, &models.Log{}).Error
 }
 
 // KafkaInit loads kafka config into instance
