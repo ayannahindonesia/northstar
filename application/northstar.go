@@ -142,7 +142,7 @@ func (x *Application) DBinit() (err error) {
 
 // AutoMigrate updates db structures
 func (x *Application) AutoMigrate() error {
-	return x.DB.AutoMigrate(&models.Client{}, &models.Log{}).Error
+	return x.DB.AutoMigrate(&models.Client{}, &models.Log{}, &models.Audittrail{}).Error
 }
 
 // KafkaInit loads kafka config into instance
