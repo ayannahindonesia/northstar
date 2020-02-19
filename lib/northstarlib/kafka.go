@@ -32,7 +32,9 @@ type (
 	Audittrail struct {
 		basemodel.BaseModel
 		Client   string `json:"client"`
-		User     string `json:"user"`
+		UserID   string `json:"user_id"`
+		Username string `json:"username"`
+		Roles    string `json:"roles"`
 		Entity   string `json:"entity"`
 		EntityID string `json:"entity_id"`
 		Action   string `json:"action"`

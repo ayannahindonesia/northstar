@@ -12,7 +12,9 @@ type (
 	Audittrail struct {
 		basemodel.BaseModel
 		Client   string `json:"client" gorm:"column:client;type:varchar(255)"`
-		User     string `json:"user" gorm:"column:user;type:varchar(255)"`
+		UserID   string `json:"user_id" gorm:"column:user_id;type:varchar(255)"`
+		Username string `json:"username" gorm:"column:username;type:varchar(255)"`
+		Roles    string `json:"roles" gorm:"column:roles;type:varchar(255)"`
 		Entity   string `json:"entity" gorm:"column:entity;type:varchar(255)"`
 		EntityID string `json:"entity_id" gorm:"column:entity_id;type:varchar(255)"`
 		Action   string `json:"action" gorm:"column:action;type:varchar(255)"`
