@@ -66,7 +66,7 @@ func AuditTrailDetail(c echo.Context) error {
 	var audittrail models.Audittrail
 
 	type AudittrailSearchID struct {
-		ID string
+		ID string `json:"id"`
 	}
 
 	err := audittrail.SingleFindFilter(&AudittrailSearchID{ID: c.Param("id")})
