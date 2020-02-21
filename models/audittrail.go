@@ -26,6 +26,7 @@ type (
 	AudittrailQueryFilter struct {
 		Client    string
 		User      string
+		Username  string
 		Entity    string
 		EntityID  string
 		Action    string
