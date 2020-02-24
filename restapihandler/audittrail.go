@@ -45,7 +45,7 @@ func AuditTrailList(c echo.Context) error {
 	log.Println(c.QueryParam("username"))
 	result, err = audittrail.PagedFindFilter(page, rows, orderby, sort, &models.AudittrailQueryFilter{
 		Client:    c.QueryParam("client"),
-		UserID:    c.QueryParam("user"),
+		UserID:    c.QueryParam("uid"),
 		Username:  c.QueryParam("username"),
 		Entity:    c.QueryParam("entity"),
 		EntityID:  c.QueryParam("entity_id"),
