@@ -24,16 +24,16 @@ type (
 
 	// AudittrailQueryFilter filter struct
 	AudittrailQueryFilter struct {
-		Client    string
-		User      string
-		Username  string
-		Entity    string
-		EntityID  string
-		Action    string
-		Original  []string
-		New       []string
-		StartDate string
-		EndDate   string
+		Client    string   `json:"client"`
+		UserID    string   `json:"user_id"`
+		Username  string   `json:"username"`
+		Entity    string   `json:"entity"`
+		EntityID  string   `json:"entity_id"`
+		Action    string   `json:"action"`
+		Original  []string `json:"original"`
+		New       []string `json:"new"`
+		StartDate string   `json:"start_date"`
+		EndDate   string   `json:"end_date"`
 	}
 )
 
@@ -121,6 +121,14 @@ func audittrailConditionQuery(query *gorm.DB, filter *AudittrailQueryFilter) *go
 
 	if len(filter.Client) > 0 {
 		query = query.Where("client = ?", filter.Client)
+	}
+
+	if len(filter.UserID) > 0 {
+		query = query.Where("user_id = ?", filter.UserID)
+	}
+
+	if len(filter.Username) > 0 {
+		query = query.Where("username LIKE ?", "%"+filter.Username+"%")
 	}
 
 	if len(filter.Entity) > 0 {

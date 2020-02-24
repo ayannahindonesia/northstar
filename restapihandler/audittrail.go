@@ -1,6 +1,7 @@
 package restapihandler
 
 import (
+	"log"
 	"net/http"
 	"northstar/models"
 	"strconv"
@@ -41,9 +42,10 @@ func AuditTrailList(c echo.Context) error {
 		}
 	}
 
+	log.Println(c.QueryParam("username"))
 	result, err = audittrail.PagedFindFilter(page, rows, orderby, sort, &models.AudittrailQueryFilter{
 		Client:    c.QueryParam("client"),
-		User:      c.QueryParam("user"),
+		UserID:    c.QueryParam("user"),
 		Username:  c.QueryParam("username"),
 		Entity:    c.QueryParam("entity"),
 		EntityID:  c.QueryParam("entity_id"),
