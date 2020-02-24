@@ -8,6 +8,7 @@ import (
 // Seed insert dummy datas
 func Seed() {
 	if application.App.ENV == "development" {
+		// use '_seed' as name suffix to mark seed datas
 		clients := []models.Client{
 			models.Client{
 				Name:   "Borrower Service",
@@ -44,6 +45,7 @@ func Seed() {
 			client.Create()
 		}
 
+		// use '_seed' as level suffix to mark seed datas
 		logs := []models.Log{
 			models.Log{
 				Level:    "info_seed",
@@ -87,9 +89,10 @@ func Seed() {
 			log.Create()
 		}
 
+		// use '_seed' as client suffix to mark seed datas
 		ats := []models.Audittrail{
 			models.Audittrail{
-				Client:   "Client A _seed_",
+				Client:   "Client A _seed",
 				UserID:   "1",
 				Username: "iamnumber1",
 				Roles:    "[1,2,3]",
@@ -100,7 +103,7 @@ func Seed() {
 				New:      `{"messages":"audit trail example 1"}`,
 			},
 			models.Audittrail{
-				Client:   "Client B _seed_",
+				Client:   "Client B _seed",
 				UserID:   "2",
 				Username: "iamnumber2",
 				Roles:    "[1,3]",
@@ -134,17 +137,12 @@ func Unseed() (err error) {
 			break
 		case "clients":
 			err = application.App.DB.
-				Or("key = ?", "borrowerkey").
-				Or("key = ?", "lenderkey").
-				Or("key = ?", "geomappingkey").
-				Or("key = ?", "messagingkey").
-				Or("key = ?", "androkey").
-				Or("key = ?", "reactkey").
+				Where("name LIKE ?", "%_seed").
 				Unscoped().Delete(&models.Client{}).Error
 			break
 		case "audittrail":
 			err = application.App.DB.
-				Where("client LIKE ?", "%_seed_").
+				Where("client LIKE ?", "%_seed").
 				Unscoped().Delete(&models.Audittrail{}).Error
 			break
 		}
