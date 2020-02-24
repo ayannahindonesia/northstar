@@ -86,6 +86,34 @@ func Seed() {
 		for _, log := range logs {
 			log.Create()
 		}
+
+		ats := []models.Audittrail{
+			models.Audittrail{
+				Client:   "Client A _seed_",
+				UserID:   "1",
+				Username: "iamnumber1",
+				Roles:    "[1,2,3]",
+				Entity:   "entity a",
+				EntityID: "1",
+				Action:   "create",
+				Original: "",
+				New:      `{"messages":"audit trail example 1"}`,
+			},
+			models.Audittrail{
+				Client:   "Client B _seed_",
+				UserID:   "2",
+				Username: "iamnumber2",
+				Roles:    "[1,3]",
+				Entity:   "entity h",
+				EntityID: "1",
+				Action:   "update",
+				Original: `{"messages":"original"}`,
+				New:      `{"messages":"new"}`,
+			},
+		}
+		for _, at := range ats {
+			at.Create()
+		}
 	}
 }
 
@@ -94,6 +122,7 @@ func Unseed() (err error) {
 	seededTables := []string{
 		"clients",
 		"logs",
+		"audittrail",
 	}
 
 	for _, s := range seededTables {
@@ -112,6 +141,11 @@ func Unseed() (err error) {
 				Or("key = ?", "androkey").
 				Or("key = ?", "reactkey").
 				Unscoped().Delete(&models.Client{}).Error
+			break
+		case "audittrail":
+			err = application.App.DB.
+				Where("client LIKE ?", "%_seed_").
+				Unscoped().Delete(&models.Audittrail{}).Error
 			break
 		}
 

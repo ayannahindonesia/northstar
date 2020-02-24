@@ -59,3 +59,21 @@ func LogList(c echo.Context) error {
 
 	return c.JSON(http.StatusOK, result)
 }
+
+// LogDetail func
+func LogDetail(c echo.Context) error {
+	defer c.Request().Body.Close()
+
+	var logDetail models.Log
+
+	type LogSearchID struct {
+		ID string `json:"id"`
+	}
+
+	err := logDetail.SingleFindFilter(&LogSearchID{ID: c.Param("id")})
+	if err != nil {
+		return c.JSON(http.StatusNotFound, err)
+	}
+
+	return c.JSON(http.StatusOK, logDetail)
+}
