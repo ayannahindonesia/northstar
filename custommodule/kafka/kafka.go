@@ -92,6 +92,13 @@ func processMessage(kafkaMessage []byte) (err error) {
 		mod.Client = client
 		err = mod.Create()
 		break
+	case "audittrail":
+		mod := models.Audittrail{}
+
+		json.Unmarshal([]byte(splitKafkaString[2]), &mod)
+		mod.Client = client
+		err = mod.Create()
+		break
 	}
 
 	return err

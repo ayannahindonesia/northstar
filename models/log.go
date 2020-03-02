@@ -2,7 +2,6 @@ package models
 
 import (
 	"math"
-	"strings"
 
 	"github.com/ayannahindonesia/basemodel"
 	"github.com/jinzhu/gorm"
@@ -68,7 +67,7 @@ func (model *Log) PagedFindFilter(page int, rows int, order []string, sort []str
 	query := basemodel.DB
 	models := []Log{}
 
-	query = conditionQuery(query, filter)
+	query = logConditionQuery(query, filter)
 	query = orderSortQuery(query, order, sort)
 
 	temp := query
@@ -104,7 +103,7 @@ func (model *Log) PagedFindFilter(page int, rows int, order []string, sort []str
 	return result, err
 }
 
-func conditionQuery(query *gorm.DB, filter *LogQueryFilter) *gorm.DB {
+func logConditionQuery(query *gorm.DB, filter *LogQueryFilter) *gorm.DB {
 	for _, v := range filter.Messages {
 		if len(v) > 0 {
 			query = query.Where("messages LIKE ?", "%"+v+"%")
@@ -140,21 +139,6 @@ func conditionQuery(query *gorm.DB, filter *LogQueryFilter) *gorm.DB {
 			filter.EndDate = filter.StartDate
 		}
 		query = query.Where("created_at BETWEEN ? AND ?", filter.StartDate, filter.EndDate)
-	}
-
-	return query
-}
-
-func orderSortQuery(query *gorm.DB, order []string, sort []string) *gorm.DB {
-	for k, v := range order {
-		q := v
-		if len(sort) > k {
-			value := sort[k]
-			if strings.ToUpper(value) == "ASC" || strings.ToUpper(value) == "DESC" {
-				q = v + " " + strings.ToUpper(value)
-			}
-		}
-		query = query.Order(q)
 	}
 
 	return query

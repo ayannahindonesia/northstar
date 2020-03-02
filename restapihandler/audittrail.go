@@ -1,28 +1,28 @@
 package restapihandler
 
 import (
+	"log"
 	"net/http"
 	"northstar/models"
 	"strconv"
 	"strings"
 
 	"github.com/ayannahindonesia/basemodel"
-
 	"github.com/labstack/echo"
 )
 
-// LogList shows log list
-func LogList(c echo.Context) error {
+// AuditTrailList list
+func AuditTrailList(c echo.Context) error {
 	defer c.Request().Body.Close()
 
 	var (
-		logs      models.Log
-		result    basemodel.PagedFindResult
-		rows      int
-		page      int
-		startDate string
-		endDate   string
-		err       error
+		audittrail models.Audittrail
+		result     basemodel.PagedFindResult
+		rows       int
+		page       int
+		startDate  string
+		endDate    string
+		err        error
 	)
 
 	// pagination parameters
@@ -42,16 +42,18 @@ func LogList(c echo.Context) error {
 		}
 	}
 
-	result, err = logs.PagedFindFilter(page, rows, orderby, sort, &models.LogQueryFilter{
+	log.Println(c.QueryParam("username"))
+	result, err = audittrail.PagedFindFilter(page, rows, orderby, sort, &models.AudittrailQueryFilter{
 		Client:    c.QueryParam("client"),
-		Tag:       c.QueryParam("tag"),
-		Note:      c.QueryParam("note"),
-		UID:       c.QueryParam("uid"),
+		UserID:    c.QueryParam("uid"),
 		Username:  c.QueryParam("username"),
-		Level:     c.QueryParam("level"),
+		Entity:    c.QueryParam("entity"),
+		EntityID:  c.QueryParam("entity_id"),
+		Action:    c.QueryParam("action"),
+		Original:  strings.Split(c.QueryParam("original"), ","),
+		New:       strings.Split(c.QueryParam("new"), ","),
 		StartDate: startDate,
 		EndDate:   endDate,
-		Messages:  strings.Split(c.QueryParam("messages"), ","),
 	})
 	if err != nil {
 		return c.JSON(http.StatusNotFound, err)
@@ -60,20 +62,20 @@ func LogList(c echo.Context) error {
 	return c.JSON(http.StatusOK, result)
 }
 
-// LogDetail func
-func LogDetail(c echo.Context) error {
+// AuditTrailDetail func
+func AuditTrailDetail(c echo.Context) error {
 	defer c.Request().Body.Close()
 
-	var logDetail models.Log
+	var audittrail models.Audittrail
 
-	type LogSearchID struct {
+	type AudittrailSearchID struct {
 		ID string `json:"id"`
 	}
 
-	err := logDetail.SingleFindFilter(&LogSearchID{ID: c.Param("id")})
+	err := audittrail.SingleFindFilter(&AudittrailSearchID{ID: c.Param("id")})
 	if err != nil {
 		return c.JSON(http.StatusNotFound, err)
 	}
 
-	return c.JSON(http.StatusOK, logDetail)
+	return c.JSON(http.StatusOK, audittrail)
 }
