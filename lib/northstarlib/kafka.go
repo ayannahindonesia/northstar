@@ -18,7 +18,7 @@ type (
 		Send         bool
 		SaramaConfig *sarama.Config
 	}
-	// Log models
+	// Log struct for client template
 	Log struct {
 		basemodel.BaseModel
 		Tag      string `json:"tag"`
@@ -28,10 +28,23 @@ type (
 		Level    string `json:"level"`
 		Messages string `json:"messages"`
 	}
+	// Audittrail struct for client template
+	Audittrail struct {
+		basemodel.BaseModel
+		Client   string `json:"client"`
+		UserID   string `json:"user_id"`
+		Username string `json:"username"`
+		Roles    string `json:"roles"`
+		Entity   string `json:"entity"`
+		EntityID string `json:"entity_id"`
+		Action   string `json:"action"`
+		Original string `json:"original"`
+		New      string `json:"new"`
+	}
 )
 
 // SubmitKafkaLog func
-func (n *NorthstarLib) SubmitKafkaLog(l Log, model string) (err error) {
+func (n *NorthstarLib) SubmitKafkaLog(l interface{}, model string) (err error) {
 	if !n.Send {
 		return nil
 	}
@@ -63,7 +76,7 @@ func (n *NorthstarLib) SubmitKafkaLog(l Log, model string) (err error) {
 	return err
 }
 
-func kafkaLogBuilder(l Log, model string) (payload map[string]interface{}) {
+func kafkaLogBuilder(l interface{}, model string) (payload map[string]interface{}) {
 	inrec, _ := json.Marshal(l)
 	json.Unmarshal(inrec, &payload)
 
