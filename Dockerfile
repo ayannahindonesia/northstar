@@ -1,24 +1,40 @@
-FROM golang:alpine
+ # === Lintas Arta's Dockerfile ===
+FROM golang:alpine  AS build-env
 
 ARG APPNAME="northstar"
-ARG CONFIGPATH="$$GOPATH/src/northstar"
+ARG CONFIGPATH="/data/"
 
 ADD . $GOPATH/src/"${APPNAME}"
 WORKDIR $GOPATH/src/"${APPNAME}"
 
-RUN apk add --no-cache --update git gcc libc-dev tzdata;
-#  tzdata wget gcc libc-dev make openssl py-pip;
+RUN apk add --update --no-cache git gcc libc-dev tzdata;
+RUN apk --no-cache add curl
+#  wget gcc libc-dev make openssl py-pip;
+RUN go get -u github.com/golang/dep/cmd/dep
 
 ENV TZ=Asia/Jakarta
 
-RUN go get -u github.com/golang/dep/cmd/dep
+RUN cd $GOPATH/src/"${APPNAME}"
 
-CMD if [ "${APPENV}" = "staging" ] || [ "${APPENV}" = "production" ] ; then \
-        openssl aes-256-cbc -d -in deploy/conf.enc -out config.yaml -pbkdf2 -pass file:./public.pem ; \
-    elif [ "${APPENV}" = "dev" ] ; then \
-        cp deploy/dev-config.yaml config.yaml ; \
-    fi \
-    && dep ensure -v \
-    && go build -v -o $GOPATH/bin/"${APPNAME}" \
-    && "${APPNAME}" run \
-EXPOSE 8006
+RUN dep ensure -v
+RUN go build -v -o "${APPNAME}-res"
+
+RUN ls -alh $GOPATH/src/
+RUN ls -alh $GOPATH/src/"${APPNAME}"
+RUN ls -alh $GOPATH/src/"${APPNAME}"/vendor
+RUN pwd
+
+FROM alpine
+
+WORKDIR /go/src/
+COPY --from=build-env /go/src/northstar/northstar-res /go/src/northstar
+#COPY --from=build-env /go/src/northstar/deploy/conf.enc /go/src/conf.enc
+COPY --from=build-env /go/src/northstar/migration/ /go/src/migration/
+RUN chmod -R 775 migration
+RUN ls -lrth
+
+RUN pwd
+#ENTRYPOINT /app/northstar-res
+CMD ["/go/src/northstar","run"]
+
+EXPOSE 8000
